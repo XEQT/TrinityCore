@@ -51,6 +51,14 @@ enum PaladinSpells
 
     SPELL_HAND_OF_SACRIFICE                      = 6940,
     SPELL_DIVINE_SACRIFICE                       = 64205,
+
+    DUMMY_CONSECRATION                           = 226,
+    SPELL_CONSECRATION                           = 26573,
+    SUMMON_CONSECRATION                          = 43499,
+    SPELL_CONSECRATIION_DAMAGE                   = 81297,
+    AURA_CONSECRATIION_DAMAGE                    = 81298,
+    TRIGGER_CONSECRATION                         = 82366,
+
 };
 
 // 31850 - Ardent Defender
@@ -701,6 +709,226 @@ class spell_pal_sacred_shield : public SpellScriptLoader
         }
 };
 
+class spell_pal_consecration : public SpellScriptLoader
+{
+    public:
+        spell_pal_consecration() : SpellScriptLoader("spell_pal_consecration") { }
+
+        class spell_pal_consecration_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_consecration_SpellScript);
+
+            bool Validate(SpellInfo const* spellEntry)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_CONSECRATION))
+                    return false;
+                return true;
+            }
+
+            bool Load()
+            {
+                
+                // if (Unit* caster = GetCaster())
+                //    if (caster->GetTypeId() == TYPEID_PLAYER)
+                        return true;
+                // return false;
+            }
+            void Unload()
+            {
+            
+            
+            }
+
+            void HandleEffectDummy()
+            {
+                Unit* target = GetHitUnit();
+                Unit* caster = GetCaster();
+                TempSummon* temp_sum = caster->SummonCreature(SUMMON_CONSECRATION, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN /* TEMPSUMMON_MANUAL_DESPAWN */, 10000);
+                Unit* summoner = temp_sum->GetSummoner();
+                temp_sum->SetOwnerGUID(caster->GetGUID());
+                // Player* test = summoner->GetSpellModOwner();
+                // int32 powerCost = 10;
+                // if(test)
+                //    test->ApplySpellMod(SPELL_CONSECRATIION_DAMAGE, SPELLMOD_CHARGES, powerCost);
+
+                temp_sum->CastSpell(temp_sum->GetPositionX(), temp_sum->GetPositionY(), temp_sum->GetPositionZ(), AURA_CONSECRATIION_DAMAGE, true, NULL, /* AuraEffect 81298 */ 0, temp_sum->GetGUID()); // , 0, 0, caster->GetGUID());
+                temp_sum->CastSpell(temp_sum->GetPositionX(), temp_sum->GetPositionY(), temp_sum->GetPositionZ(), SPELL_CONSECRATIION_DAMAGE, true, NULL, /* AuraEffect 81297 */ 0, temp_sum->GetGUID()); // , 0, 0, caster->GetGUID());
+
+            }
+    
+            void HandleOnCheckCast()
+            {
+            }
+            
+            void HandleOnHit()
+            {
+            }
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                targets.remove(GetExplTargetUnit());
+            }
+
+
+            void Register()
+            {
+                // OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pal_consecration_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+                OnHit += SpellHitFn(spell_pal_consecration_SpellScript::HandleOnHit);
+                OnCast += SpellCastFn(spell_pal_consecration_SpellScript::HandleEffectDummy); // , EFFECT_0, SPELL_EFFECT_DUMMY);
+
+            }       
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_consecration_SpellScript();
+        }
+
+};
+
+class spell_pal_consecration_aura : public SpellScriptLoader
+{
+    public:
+        spell_pal_consecration_aura() : SpellScriptLoader("spell_pal_consecration_aura") { }
+
+        class spell_pal_consecration_auraAuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_pal_consecration_auraAuraScript);
+
+            bool Validate(SpellInfo const* spellEntry)
+            {
+                if (!sSpellMgr->GetSpellInfo(81298))
+                     return false;
+                return true;
+            }
+
+            bool Load()
+            {
+                
+               // if (Unit* caster = GetCaster())
+               //     if (caster->GetTypeId() == TYPEID_PLAYER)
+                        return true;
+               // return false;
+            
+            }
+
+            void Unload()
+            {
+            
+            
+            }
+           
+            void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+            {
+                // sLog->outInfo(LOG_FILTER_GENERAL, "Aura Effect is about to be applied on target!");
+                // this hook allows you to prevent execution of AuraEffect handler, or to replace it with your own handler
+                // PreventDefaultAction();
+            }
+            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                // sLog->outInfo(LOG_FILTER_GENERAL, "Aura Effect is about to be removed from target!");
+                // this hook allows you to prevent execution of AuraEffect handler, or to replace it with your own handler
+                //PreventDefaultAction();
+            }
+
+            void HandleAfterEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                // sLog->outInfo(LOG_FILTER_GENERAL, "Aura Effect has just been applied on target!");
+
+            }
+
+            void HandleAfterEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                sLog->outInfo(LOG_FILTER_GENERAL, "Aura Effect has just been just removed from target!");
+
+                // Unit* caster = GetCaster();
+                // caster may be not avalible (logged out for example)
+                // if (!caster)
+                //    return;
+                // cast spell on caster on aura remove
+            }
+
+            void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+            {
+                // sLog->outInfo(LOG_FILTER_GENERAL, "Perioidic Aura Effect is does a tick on target!");
+                // Unit* target = GetTarget();
+                Unit* caster = GetCaster();
+                Unit* summoner = caster->GetOwner();
+
+                if(summoner)
+                {
+                    summoner->CastSpell(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), SPELL_CONSECRATIION_DAMAGE, true, 0, 0, summoner->GetGUID());
+                }
+            }
+
+            void HandleEffectPeriodicUpdate(AuraEffect* aurEff)
+            {
+                // sLog->outInfo(LOG_FILTER_GENERAL, "Perioidic Aura Effect is now updated!");
+                // we're doubling aura amount every tick
+                aurEff->ChangeAmount(aurEff->GetAmount() * 2);
+
+            }
+
+            void HandleEffectCalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+            {
+                // sLog->outInfo(LOG_FILTER_GENERAL, "Amount of Aura Effect is being calculated now!");
+                // we're setting amount to 100
+                amount = 100;
+                // amount will be never recalculated due to applying passive aura
+                canBeRecalculated = false;
+            }
+
+            void HandleEffectCalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+            {
+                sLog->outInfo(LOG_FILTER_GENERAL, "Periodic data of Aura Effect is being calculated now!");
+                // we're setting aura to be periodic and tick every 10 seconds
+                isPeriodic = true;
+                amplitude = 1 * IN_MILLISECONDS;
+            }
+
+            void HandleEffectCalcSpellMod(AuraEffect const* /*aurEff*/, SpellModifier*& spellMod)
+            {
+                // sLog->outInfo(LOG_FILTER_GENERAL, "SpellMod data of Aura Effect is being calculated now!");
+
+                
+                // alternative: we want spellmod for spell which doesn't have it
+                /* if (!spellMod)
+                {
+                    spellMod = new SpellModifier(GetAura());
+                    spellMod->op = SPELLMOD_DOT;
+                    spellMod->type = SPELLMOD_PCT;
+                    spellMod->spellId = GetId();
+                    spellMod->mask[1] = 0x00002000;
+                }*/
+                
+            }
+
+            void Register()
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_pal_consecration_auraAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectRemove += AuraEffectRemoveFn(spell_pal_consecration_auraAuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                // AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK - makes handler to be called when aura is reapplied on target
+                AfterEffectApply += AuraEffectApplyFn(spell_pal_consecration_auraAuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_pal_consecration_auraAuraScript::HandleAfterEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_pal_consecration_auraAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+                OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_pal_consecration_auraAuraScript::HandleEffectPeriodicUpdate, EFFECT_0, SPELL_AURA_DUMMY);
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_consecration_auraAuraScript::HandleEffectCalcAmount, EFFECT_0, SPELL_AURA_DUMMY);
+                DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_pal_consecration_auraAuraScript::HandleEffectCalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+                DoEffectCalcSpellMod += AuraEffectCalcSpellModFn(spell_pal_consecration_auraAuraScript::HandleEffectCalcSpellMod, EFFECT_0, SPELL_AURA_DUMMY);
+                /*OnApply += AuraEffectApplyFn();
+                OnRemove += AuraEffectRemoveFn();
+                DoCheckAreaTarget += AuraCheckAreaTargetFn();*/
+
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_pal_consecration_auraAuraScript();
+        }
+};
+
+
 void AddSC_paladin_spell_scripts()
 {
     //new spell_pal_ardent_defender();
@@ -717,4 +945,9 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_lay_on_hands();
     new spell_pal_righteous_defense();
     new spell_pal_sacred_shield();
+
+    // ADDED By XEQT
+    new spell_pal_consecration();
+    new spell_pal_consecration_aura();
+
 }
