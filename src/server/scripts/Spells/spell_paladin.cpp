@@ -762,7 +762,7 @@ class spell_pal_consecration : public SpellScriptLoader
                 Unit* target = GetHitUnit();
                 Unit* caster = GetCaster();
                 TempSummon* temp_sum = caster->SummonCreature(SUMMON_CONSECRATION, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN /* TEMPSUMMON_MANUAL_DESPAWN */, 10000);
-                Unit* summoner = temp_sum->GetSummoner();
+                // Unit* summoner = temp_sum->GetSummoner();
                 temp_sum->SetOwnerGUID(caster->GetGUID());
 
                 temp_sum->CastSpell(temp_sum->GetPositionX(), temp_sum->GetPositionY(), temp_sum->GetPositionZ(), AURA_CONSECRATIION_DAMAGE, true, NULL, /* AuraEffect 81298 */ 0, temp_sum->GetGUID()); // , 0, 0, caster->GetGUID());
