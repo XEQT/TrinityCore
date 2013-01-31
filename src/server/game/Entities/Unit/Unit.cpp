@@ -5989,10 +5989,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     break;
                 }
             }
-
-            switch (dummySpell->Id)
-            {
-            }
             break;
         }
         case SPELLFAMILY_PALADIN:
