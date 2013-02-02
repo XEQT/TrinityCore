@@ -3291,7 +3291,7 @@ void Player::Regenerate(Powers power)
         return;
 
     // Skip regeneration for power type we cannot have
-    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
+    uint32 powerIndex = GetPowerIndex(power);
     if (powerIndex == MAX_POWERS)
         return;
 
@@ -18182,7 +18182,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     uint32 loadedPowers = 0;
     for (uint32 i = 0; i < MAX_POWERS; ++i)
     {
-        if (GetPowerIndexByClass(Powers(i), getClass()) != MAX_POWERS)
+        if (GetPowerIndex(i) != MAX_POWERS)
         {
             uint32 savedPower = fields[47+loadedPowers].GetUInt32();
             uint32 maxPower = GetUInt32Value(UNIT_FIELD_MAXPOWER1 + loadedPowers);
@@ -19776,7 +19776,7 @@ void Player::SaveToDB(bool create /*=false*/)
         uint32 storedPowers = 0;
         for (uint32 i = 0; i < MAX_POWERS; ++i)
         {
-            if (GetPowerIndexByClass(Powers(i), getClass()) != MAX_POWERS)
+            if (GetPowerIndex(i) != MAX_POWERS)
             {
                 stmt->setUInt32(index++, GetUInt32Value(UNIT_FIELD_POWER1 + storedPowers));
                 if (++storedPowers >= MAX_POWERS_PER_CLASS)
@@ -19896,7 +19896,7 @@ void Player::SaveToDB(bool create /*=false*/)
         uint32 storedPowers = 0;
         for (uint32 i = 0; i < MAX_POWERS; ++i)
         {
-            if (GetPowerIndexByClass(Powers(i), getClass()) != MAX_POWERS)
+            if (GetPowerIndex(i) != MAX_POWERS)
             {
                 stmt->setUInt32(index++, GetUInt32Value(UNIT_FIELD_POWER1 + storedPowers));
                 if (++storedPowers >= MAX_POWERS_PER_CLASS)
@@ -23295,26 +23295,28 @@ void Player::InitPrimaryProfessions()
     SetFreePrimaryProfessions(sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL));
 }
 
-void Player::ModifyMoney(int64 d)
+bool Player::ModifyMoney(int64 amount, bool sendError /*= true*/)
 {
-    sScriptMgr->OnPlayerMoneyChanged(this, d);
+    if (!amount)
+        return true;
 
-    if (d < 0)
-        SetMoney (GetMoney() > uint64(-d) ? GetMoney() + d : 0);
+    sScriptMgr->OnPlayerMoneyChanged(this, amount);
+
+    if (amount < 0)
+        SetMoney (GetMoney() > uint64(-amount) ? GetMoney() + amount : 0);
     else
     {
-        uint64 newAmount = 0;
-        if (GetMoney() < uint64(MAX_MONEY_AMOUNT - d))
-            newAmount = GetMoney() + d;
+        if (GetMoney() < uint64(MAX_MONEY_AMOUNT - amount))
+            SetMoney(GetMoney() + amount);
         else
         {
-            // "At Gold Limit"
-            newAmount = MAX_MONEY_AMOUNT;
-            if (d)
+            if (sendError)
                 SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, NULL);
+            return false;
         }
-        SetMoney(newAmount);
     }
+
+    return true;
 }
 
 Unit* Player::GetSelectedUnit() const
