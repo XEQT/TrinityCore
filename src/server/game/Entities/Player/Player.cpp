@@ -5731,7 +5731,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE_BY_OWNER);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
@@ -8574,7 +8574,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     }
 
     // group update
-    if (Group* group = GetGroup())
+    if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FULL);
 
     m_zoneUpdateId    = newZone;
