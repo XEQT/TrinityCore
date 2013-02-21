@@ -1,4 +1,4 @@
-    /*
+/*
  * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -439,10 +439,7 @@ void AccountMgr::LoadRBAC()
     Tokenizer tokens(defaultGroups, ',');
     for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         if (uint32 groupId = atoi(*itr))
-        {
-            sLog->outError(LOG_FILTER_LFG, "Adding default group %u", groupId);
             _defaultGroups.insert(groupId);
-        }
 }
 
 void AccountMgr::UpdateAccountAccess(RBACData* rbac, uint32 accountId, uint8 securityLevel, int32 realmId)
