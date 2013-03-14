@@ -27016,6 +27016,7 @@ void Player::ActivateSpec(uint8 spec)
     ClearComboPointHolders();
     ClearAllReactives();
     UnsummonAllTotems();
+    ExitVehicle();
     RemoveAllControlled();
     /*RemoveAllAurasOnDeath();
     if (GetPet())
