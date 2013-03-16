@@ -3156,6 +3156,7 @@ void ObjectMgr::LoadPlayerInfo()
                 Field* fields = result->Fetch();
                 uint32 raceMask = fields[0].GetUInt32();
                 uint32 classMask = fields[1].GetUInt32();
+                uint32 spellId = fields[2].GetUInt32();
 
                 if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
                 {
@@ -3178,15 +3179,18 @@ void ObjectMgr::LoadPlayerInfo()
                             if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
                             {
                                 if (PlayerInfo* info = _playerInfo[raceIndex][classIndex])
-                                    info->spell.push_back(fields[2].GetUInt32());
-                                else if (raceMask != 0 && classMask != 0)
-                                    sLog->outError(LOG_FILTER_SQL, "Racemask/classmask (%u/%u) combination was found containing an invalid race/class combination (%u/%u) in `playercreateinfo_spell` (Spell %u), ignoring.", raceMask, classMask, raceIndex, classIndex, fields[2].GetUInt32());
+                                {
+                                    info->spell.push_back(spellId);
+                                    ++count;
+                                }
+                                // We need something better here, the check is not accounting for spells used by multiple races/classes but not all of them.
+                                // Either split the masks per class, or per race, which kind of kills the point yet.
+                                // else if (raceMask != 0 && classMask != 0)
+                                //     sLog->outError(LOG_FILTER_SQL, "Racemask/classmask (%u/%u) combination was found containing an invalid race/class combination (%u/%u) in `playercreateinfo_spell` (Spell %u), ignoring.", raceMask, classMask, raceIndex, classIndex, spellId);
                             }
                         }
                     }
                 }
-
-                ++count;
             }
             while (result->NextRow());
 
@@ -8733,7 +8737,7 @@ void ObjectMgr::LoadHotfixData()
 
         HotfixInfo info;
         info.Entry = fields[0].GetUInt32();
-        info.Type = fields[1].GetUInt32();
+        info.Type = DB2Hash(fields[1].GetUInt32());
         info.Timestamp = fields[2].GetUInt64();
         _hotfixData.push_back(info);
 
@@ -8742,6 +8746,41 @@ void ObjectMgr::LoadHotfixData()
     while (result->NextRow());
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u hotfix info entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadMissingKeyChains()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT keyId, k1, k2, k3, k4, k5, k6, k7, k8, "
+                                                     "k9, k10, k11, k12, k13, k14, k15, k16, "
+                                                     "k17, k18, k19, k20, k21, k22, k23, k24, "
+                                                     "k25, k26, k27, k28, k29, k30, k31, k32 "
+                                                     "FROM keychain_db2 ORDER BY keyId DESC");
+
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 KeyChain entries. DB table `keychain_db2` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 id = fields[0].GetUInt32();
+
+        KeyChainEntry* kce = sKeyChainStore.CreateEntry(id, true);
+        kce->Id = id;
+        for (uint32 i = 0; i < KEYCHAIN_SIZE; ++i)
+            kce->Key[i] = fields[1 + i].GetUInt8();
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u KeyChain entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadFactionChangeSpells()
