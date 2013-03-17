@@ -32,7 +32,7 @@ public:
 
     virtual bool HasRecord(uint32 id) const = 0;
 
-    virtual void WriteRecord(uint32 id, ByteBuffer& buffer) const = 0;
+    virtual void WriteRecord(uint32 id, uint32 locale, ByteBuffer& buffer) const = 0;
 
 protected:
     uint32 tableHash;
@@ -48,7 +48,7 @@ bool DB2StorageHasEntry(DB2Storage<T> const& store, uint32 id)
 }
 
 template<class T>
-void WriteDB2RecordToPacket(DB2Storage<T> const& store, uint32 id, ByteBuffer& buffer)
+void WriteDB2RecordToPacket(DB2Storage<T> const& store, uint32 id, uint32 locale, ByteBuffer& buffer)
 {
     uint8 const* entry = (uint8 const*)store.LookupEntry(id);
     ASSERT(entry);
@@ -73,10 +73,15 @@ void WriteDB2RecordToPacket(DB2Storage<T> const& store, uint32 id, ByteBuffer& b
                 break;
             case FT_STRING:
             {
-                size_t len = strlen(*(char**)entry);
+                LocalizedString* locStr = *(LocalizedString**)entry;
+                if (locStr->Str[locale][0] == '\0')
+                    locale = 0;
+
+                char const* str = locStr->Str[locale];
+                size_t len = strlen(str);
                 buffer << uint16(len);
                 if (len)
-                    buffer << *(char**)entry;
+                    buffer << str;
                 entry += sizeof(char*);
                 break;
             }
@@ -97,25 +102,26 @@ class DB2Storage : public DB2StorageBase
     typedef std::list<char*> StringPoolList;
     typedef std::vector<T*> DataTableEx;
     typedef bool(*EntryChecker)(DB2Storage<T> const&, uint32);
-    typedef void(*PacketWriter)(DB2Storage<T> const&, uint32, ByteBuffer&);
+    typedef void(*PacketWriter)(DB2Storage<T> const&, uint32, uint32, ByteBuffer&);
 public:
     DB2Storage(char const* f, EntryChecker checkEntry = NULL, PacketWriter writePacket = NULL) :
-        nCount(0), fieldCount(0), fmt(f), indexTable(NULL), m_dataTable(NULL)
+        nCount(0), fieldCount(0), fmt(f), m_dataTable(NULL)
     {
-        CheckEntry = checkEntry ? checkEntry : &DB2StorageHasEntry<T>;
-        WritePacket = writePacket ? writePacket : &WriteDB2RecordToPacket<T>;
+        indexTable.asT = NULL;
+        CheckEntry = checkEntry ? checkEntry : (EntryChecker)&DB2StorageHasEntry<T>;
+        WritePacket = writePacket ? writePacket : (PacketWriter)&WriteDB2RecordToPacket<T>;
     }
 
     ~DB2Storage() { Clear(); }
 
     bool HasRecord(uint32 id) const { return CheckEntry(*this, id); }
-    T const* LookupEntry(uint32 id) const { return (id >= nCount) ? NULL : indexTable[id]; }
+    T const* LookupEntry(uint32 id) const { return (id >= nCount) ? NULL : indexTable.asT[id]; }
     uint32 GetNumRows() const { return nCount; }
     char const* GetFormat() const { return fmt; }
     uint32 GetFieldCount() const { return fieldCount; }
-    void WriteRecord(uint32 id, ByteBuffer& buffer) const
+    void WriteRecord(uint32 id, uint32 locale, ByteBuffer& buffer) const
     {
-        WritePacket(*this, id, buffer);
+        WritePacket(*this, id, locale, buffer);
     }
 
     T* CreateEntry(uint32 id, bool evenIfExists = false)
@@ -128,21 +134,21 @@ public:
             // reallocate index table
             char** tmpIdxTable = new char*[id + 1];
             memset(tmpIdxTable, 0, (id + 1) * sizeof(char*));
-            memcpy(tmpIdxTable, (char*)indexTable, nCount * sizeof(char*));
-            delete[] ((char*)indexTable);
+            memcpy(tmpIdxTable, indexTable.asChar, nCount * sizeof(char*));
+            delete[] reinterpret_cast<char*>(indexTable.asT);
             nCount = id + 1;
-            indexTable = (T**)tmpIdxTable;
+            indexTable.asChar = tmpIdxTable;
         }
 
         T* entryDst = new T;
         m_dataTableEx.push_back(entryDst);
-        indexTable[id] = entryDst;
+        indexTable.asT[id] = entryDst;
         return entryDst;
     }
 
-    void EraseEntry(uint32 id) { indexTable[id] = NULL; }
+    void EraseEntry(uint32 id) { indexTable.asT[id] = NULL; }
 
-    bool Load(char const* fn)
+    bool Load(char const* fn, uint32 locale)
     {
         DB2FileLoader db2;
         // Check if load was sucessful, only then continue
@@ -153,22 +159,22 @@ public:
         tableHash = db2.GetHash();
 
         // load raw non-string data
-        m_dataTable = (T*)db2.AutoProduceData(fmt, nCount, (char**&)indexTable);
+        m_dataTable = reinterpret_cast<T*>(db2.AutoProduceData(fmt, nCount, indexTable.asChar));
 
         // create string holders for loaded string fields
         m_stringPoolList.push_back(db2.AutoProduceStringsArrayHolders(fmt, (char*)m_dataTable));
 
         // load strings from dbc data
-        m_stringPoolList.push_back(db2.AutoProduceStrings(fmt, (char*)m_dataTable));
+        m_stringPoolList.push_back(db2.AutoProduceStrings(fmt, (char*)m_dataTable, locale));
 
         // error in dbc file at loading if NULL
-        return indexTable!=NULL;
+        return indexTable.asT != NULL;
     }
 
-    bool LoadStringsFrom(char const* fn)
+    bool LoadStringsFrom(char const* fn, uint32 locale)
     {
         // DBC must be already loaded using Load
-        if (!indexTable)
+        if (!indexTable.asT)
             return false;
 
         DB2FileLoader db2;
@@ -177,20 +183,20 @@ public:
             return false;
 
         // load strings from another locale dbc data
-        m_stringPoolList.push_back(db2.AutoProduceStrings(fmt, (char*)m_dataTable));
+        m_stringPoolList.push_back(db2.AutoProduceStrings(fmt, (char*)m_dataTable, locale));
 
         return true;
     }
 
     void Clear()
     {
-        if (!indexTable)
+        if (!indexTable.asT)
             return;
 
-        delete[] ((char*)indexTable);
-        indexTable = NULL;
+        delete[] reinterpret_cast<char*>(indexTable.asT);
+        indexTable.asT = NULL;
 
-        delete[] ((char*)m_dataTable);
+        delete[] reinterpret_cast<char*>(m_dataTable);
         m_dataTable = NULL;
 
         for (typename DataTableEx::iterator itr = m_dataTableEx.begin(); itr != m_dataTableEx.end(); ++itr)
@@ -213,7 +219,11 @@ private:
     uint32 nCount;
     uint32 fieldCount;
     char const* fmt;
-    T** indexTable;
+    union
+    {
+        T** asT;
+        char** asChar;
+    } indexTable;
     T* m_dataTable;
     DataTableEx m_dataTableEx;
     StringPoolList m_stringPoolList;
