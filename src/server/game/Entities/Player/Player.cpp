@@ -7458,6 +7458,8 @@ bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type)
                 return false;
             }
             break;
+        case ACTION_BUTTON_EXPANDABLE:
+            break;
         case ACTION_BUTTON_C:
         case ACTION_BUTTON_CMACRO:
         case ACTION_BUTTON_MACRO:
