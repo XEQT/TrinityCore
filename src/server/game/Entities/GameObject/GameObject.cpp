@@ -189,8 +189,11 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         return false;
     }
 
-    Object::_Create(guidlow, goinfo->entry, HIGHGUID_GAMEOBJECT);
-
+    // Object::_Create(guidlow, goinfo->entry, HIGHGUID_GAMEOBJECT);
+    if (goinfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+        Object::_Create(guidlow, 0, HIGHGUID_MO_TRANSPORT);
+    else
+        Object::_Create(guidlow, goinfo->entry, HIGHGUID_GAMEOBJECT); 
     m_goInfo = goinfo;
 
     if (goinfo->type >= MAX_GAMEOBJECT_TYPE)
@@ -199,11 +202,21 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         return false;
     }
 
+    // transport gameobject must have entry in TransportAnimation.dbc or client will crash
+    if (goinfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+        if (sTransportAnimationsByEntry.find(goinfo->entry) == sTransportAnimationsByEntry.end())
+        {
+            sLog->outError(LOG_FILTER_TRANSPORTS, "GameObject::Create: gameobject entry %u guid %u is transport, but does not have entry in TransportAnimation.dbc. Can't spawn.",
+                goinfo->entry, guidlow);
+            return false;
+        }
+
     SetFloatValue(GAMEOBJECT_PARENTROTATION+0, rotation0);
     SetFloatValue(GAMEOBJECT_PARENTROTATION+1, rotation1);
 
     UpdateRotationFields(rotation2, rotation3);              // GAMEOBJECT_FACING, GAMEOBJECT_ROTATION, GAMEOBJECT_PARENTROTATION+2/3
 
+ 
     SetObjectScale(goinfo->size);
 
     SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
@@ -235,11 +248,17 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
             SetUInt32Value(GAMEOBJECT_PARENTROTATION, m_goInfo->building.destructibleData);
             break;
         case GAMEOBJECT_TYPE_TRANSPORT:
+            SetUInt32Value(GAMEOBJECT_LEVEL, getMSTime());
+            if (goinfo->transport.startOpen)
+                SetGoState(GO_STATE_ACTIVE);
+            break;
+/*        case GAMEOBJECT_TYPE_TRANSPORT:
             SetUInt32Value(GAMEOBJECT_LEVEL, goinfo->transport.pause);
             if (goinfo->transport.startOpen)
                 SetGoState(GO_STATE_ACTIVE);
             SetGoAnimProgress(animprogress);
             break;
+*/
         case GAMEOBJECT_TYPE_FISHINGNODE:
             SetGoAnimProgress(0);
             break;
@@ -864,7 +883,7 @@ bool GameObject::IsDynTransport() const
     if (!gInfo)
         return false;
 
-    return gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT || (gInfo->type == GAMEOBJECT_TYPE_TRANSPORT && !gInfo->transport.pause);
+    return gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT || (gInfo->type == GAMEOBJECT_TYPE_TRANSPORT && !gInfo->transport.startFrame); // .pause);
 }
 
 bool GameObject::IsDestructibleBuilding() const

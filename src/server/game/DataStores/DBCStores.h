@@ -227,6 +227,10 @@ extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
 extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
 extern DBCStorage <WorldSafeLocsEntry>           sWorldSafeLocsStore;
 
+// Added By XEQT
+extern TransportAnimationsByEntry                sTransportAnimationsByEntry;
+extern DBCStorage <TransportAnimationEntry>      sTransportAnimationStore;
+
 void LoadDBCStores(const std::string& dataPath);
 
 #endif

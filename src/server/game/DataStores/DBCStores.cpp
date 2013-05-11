@@ -228,6 +228,10 @@ TaxiMask sHordeTaxiNodesMask;
 TaxiMask sAllianceTaxiNodesMask;
 TaxiMask sDeathKnightTaxiNodesMask;
 
+// Added By XEQT
+TransportAnimationsByEntry sTransportAnimationsByEntry;
+DBCStorage <TransportAnimationEntry> sTransportAnimationStore(TransportAnimationEntryfmt); 
+
 // DBC used only for initialization sTaxiPathSetBySource at startup.
 TaxiPathSetBySource sTaxiPathSetBySource;
 DBCStorage <TaxiPathEntry> sTaxiPathStore(TaxiPathEntryfmt);
@@ -328,6 +332,12 @@ void LoadDBCStores(const std::string& dataPath)
         }
     }
 
+    // Added By XEQT
+    LoadDBC(availableDbcLocales, bad_dbc_files, sTransportAnimationStore,    dbcPath,"TransportAnimation.dbc");
+    for (uint32 i = 0; i < sTransportAnimationStore.GetNumRows(); ++i)
+        if (TransportAnimationEntry const* entry = sTransportAnimationStore.LookupEntry(i))
+            sTransportAnimationsByEntry[entry->transportEntry][entry->timeFrame] = entry;
+ 
     LoadDBC(availableDbcLocales, bad_dbc_files, sAchievementStore,            dbcPath, "Achievement.dbc", &CustomAchievementfmt, &CustomAchievementIndex);//14545
     LoadDBC(availableDbcLocales, bad_dbc_files, sAchievementCriteriaStore,    dbcPath, "Achievement_Criteria.dbc");//14545
     LoadDBC(availableDbcLocales, bad_dbc_files, sAreaTriggerStore,            dbcPath, "AreaTrigger.dbc");//14545

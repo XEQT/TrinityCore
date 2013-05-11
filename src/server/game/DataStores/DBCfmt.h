@@ -157,6 +157,8 @@ char const TaxiNodesEntryfmt[] = "nifffsiiixx";
 char const TaxiPathEntryfmt[] = "niii";
 char const TaxiPathNodeEntryfmt[] = "diiifffiiii";
 char const TotemCategoryEntryfmt[] = "nxii";
+// Added By XEQT
+const char TransportAnimationEntryfmt[] = "diixxxx"; 
 char const VehicleEntryfmt[] = "niffffiiiiiiiifffffffffffffffssssfifiixx";
 char const VehicleSeatEntryfmt[] = "niiffffffffffiiiiiifffffffiiifffiiiiiiiffiiiiixxxxxxxxxxxxxxxxxxxx";
 char const WMOAreaTableEntryfmt[] = "niiixxxxxiixxxx";
