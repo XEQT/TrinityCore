@@ -27645,10 +27645,13 @@ void Player::SendMovementSetCanTransitionBetweenSwimAndFly(bool apply)
 
 void Player::SendMovementSetCollisionHeight(float height)
 {
+    // Added By XEQT
+    /*
     static MovementStatusElements const heightElement = MSEExtraFloat;
     Movement::ExtraMovementStatusElement extra(&heightElement);
     extra.Data.floatData = height;
     Movement::PacketSender(this, NULL_OPCODE, SMSG_MOVE_SET_COLLISION_HEIGHT, SMSG_MOVE_UPDATE_COLLISION_HEIGHT, &extra).Send();
+    */
 }
 
 float Player::GetCollisionHeight(bool mounted) const
