@@ -48,7 +48,6 @@ enum PaladinSpells
 
     SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE          = 25997,
 
-<<<<<<< HEAD
     SPELL_PALADIN_FORBEARANCE                    = 25771,
     SPELL_PALADIN_AVENGING_WRATH_MARKER          = 61987,
     SPELL_PALADIN_IMMUNE_SHIELD_MARKER           = 61988,
@@ -72,11 +71,10 @@ enum PaladinSpells
     SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742,
 
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
-    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411
-=======
+    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
+
     SPELL_HAND_OF_SACRIFICE                      = 6940,
-    SPELL_DIVINE_SACRIFICE                       = 64205,
->>>>>>> parent of ef72a79... Added Bots and addons chat fix two
+    SPELL_DIVINE_SACRIFICE                       = 64205
 };
 
 // 31850 - Ardent Defender
@@ -855,7 +853,6 @@ class spell_pal_sacred_shield : public SpellScriptLoader
         }
 };
 
-<<<<<<< HEAD
 class spell_pal_consecration : public SpellScriptLoader
 {
     public:
@@ -1187,8 +1184,6 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
 };
 
 
-=======
->>>>>>> parent of ef72a79... Added Bots and addons chat fix two
 void AddSC_paladin_spell_scripts()
 {
     //new spell_pal_ardent_defender();
@@ -1207,13 +1202,10 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_lay_on_hands();
     new spell_pal_righteous_defense();
     new spell_pal_sacred_shield();
-<<<<<<< HEAD
     new spell_pal_templar_s_verdict();
 
     // ADDED By XEQT
     new spell_pal_consecration();
     new spell_pal_consecration_aura();
 
-=======
->>>>>>> parent of ef72a79... Added Bots and addons chat fix two
 }

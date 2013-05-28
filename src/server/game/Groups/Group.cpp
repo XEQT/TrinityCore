@@ -396,13 +396,9 @@ bool Group::AddMember(Player* player)
 
     SubGroupCounterIncrease(subGroup);
 
-<<<<<<< HEAD
     player->SetGroupInvite(NULL);
     if (player->GetGroup())
-    if (IS_PLAYER_GUID(player->GetGUID()))
-=======
     if (player)
->>>>>>> parent of ef72a79... Added Bots and addons chat fix two
     {
         if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
             player->SetBattlegroundOrBattlefieldRaid(this, subGroup);
@@ -441,12 +437,8 @@ bool Group::AddMember(Player* player)
     SendUpdate();
     sScriptMgr->OnGroupAddMember(this, player->GetGUID());
 
-<<<<<<< HEAD
     if (!IsLeader(player->GetGUID()) && !isBGGroup() && !isBFGroup())
-    if (IS_PLAYER_GUID(player->GetGUID()))
-=======
     if (player)
->>>>>>> parent of ef72a79... Added Bots and addons chat fix two
     {
         // reset the new member's instances, unless he is currently in one of them
         // including raid/heroic instances that they are not permanently bound to!
