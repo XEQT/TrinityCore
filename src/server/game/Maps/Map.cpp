@@ -2194,10 +2194,7 @@ uint32 Map::GetPlayersCountExceptGMs() const
     uint32 count = 0;
     for (MapRefManager::const_iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
         if (!itr->getSource()->isGameMaster())
-        {
             ++count;
-            count += itr->getSource()->GetNpcBotsCount();
-        }
     return count;
 }
 

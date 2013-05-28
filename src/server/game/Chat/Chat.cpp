@@ -730,10 +730,9 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         *data << channelName;
         *data << uint64(target_guid);
     }
-    else if (type == uint8(CHAT_MSG_ADDON) || language == uint32(LANG_ADDON))
+    else if (type == uint8(CHAT_MSG_ADDON))
     {
         ASSERT(addonPrefix);
-        *data << uint64(0);
         *data << addonPrefix;
     }
     else

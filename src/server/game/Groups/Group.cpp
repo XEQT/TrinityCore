@@ -110,11 +110,6 @@ bool Group::Create(Player* leader)
     if (m_groupType & GROUPTYPE_RAID)
         _initRaidSubGroupsCounter();
 
-    if (leader->HaveBot())//npcbots so set to free-for-all on create
-        m_lootMethod = FREE_FOR_ALL;
-    else if (leader->HavePBot())//playerbots so set master loot
-        m_lootMethod = MASTER_LOOT;
-    else
     if (!isLFGGroup())
         m_lootMethod = GROUP_LOOT;
 
@@ -401,9 +396,13 @@ bool Group::AddMember(Player* player)
 
     SubGroupCounterIncrease(subGroup);
 
+<<<<<<< HEAD
     player->SetGroupInvite(NULL);
     if (player->GetGroup())
     if (IS_PLAYER_GUID(player->GetGUID()))
+=======
+    if (player)
+>>>>>>> parent of ef72a79... Added Bots and addons chat fix two
     {
         if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
             player->SetBattlegroundOrBattlefieldRaid(this, subGroup);
@@ -442,8 +441,12 @@ bool Group::AddMember(Player* player)
     SendUpdate();
     sScriptMgr->OnGroupAddMember(this, player->GetGUID());
 
+<<<<<<< HEAD
     if (!IsLeader(player->GetGUID()) && !isBGGroup() && !isBFGroup())
     if (IS_PLAYER_GUID(player->GetGUID()))
+=======
+    if (player)
+>>>>>>> parent of ef72a79... Added Bots and addons chat fix two
     {
         // reset the new member's instances, unless he is currently in one of them
         // including raid/heroic instances that they are not permanently bound to!
@@ -641,9 +644,6 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod& method /*= GROUP_REMOV
         }
 
         if (m_memberMgr.getSize() < ((isLFGGroup() || isBGGroup()) ? 1u : 2u))
-        //npcbot
-        if (GetMembersCount() < ((isBGGroup() || isLFGGroup()) ? 1u : 2u))
-        //end npcbot
             Disband();
 
         return true;
