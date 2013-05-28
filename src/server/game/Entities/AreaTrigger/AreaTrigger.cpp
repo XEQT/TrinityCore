@@ -95,7 +95,7 @@ void AreaTrigger::Update(uint32 p_time)
     else
         Remove(); // expired
 
-    Object::Update(p_time);
+    WorldObject::Update(p_time);
 }
 
 void AreaTrigger::Remove()
