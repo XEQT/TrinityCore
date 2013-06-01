@@ -2355,7 +2355,8 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
 void WorldObject::SendPlaySound(uint32 Sound, bool OnlySelf)
 {
     WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << Sound;
+    data << uint32(Sound);
+    data << uint64(GetGUID());
     if (OnlySelf && GetTypeId() == TYPEID_PLAYER)
         this->ToPlayer()->GetSession()->SendPacket(&data);
     else
@@ -3301,6 +3302,7 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
 {
     WorldPacket data(SMSG_PLAY_SOUND, 4);
     data << uint32(sound_id);
+    data << uint64(GetGUID());
     if (target)
         target->SendDirectMessage(&data);
     else
