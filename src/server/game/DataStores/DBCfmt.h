@@ -25,7 +25,7 @@
 char const Achievementfmt[] = "niixsxiixixxii";
 const std::string CustomAchievementfmt = "pppaaaapapaapp";
 const std::string CustomAchievementIndex = "ID";
-char const AchievementCriteriafmt[] = "niiiiiiiisiiiiixxiiiiii";
+char const AchievementCriteriafmt[] = "niiiixiiiisiiiiixxiiiii";
 char const AreaTableEntryfmt[] = "iiinixxxxxisiiiiiffixxxxxx";
 char const AreaGroupEntryfmt[] = "niiiiiii";
 char const AreaPOIEntryfmt[] = "niiiiiiiiiiiffixixxixx";
@@ -165,6 +165,7 @@ char const TaxiPathNodeEntryfmt[] = "diiifffiiii";
 char const TotemCategoryEntryfmt[] = "nxii";
 // Added By XEQT
 const char TransportAnimationEntryfmt[] = "diixxxx"; 
+char const UnitPowerBarfmt[] = "niixxxxxxxxxxxxxxxxxxxxxxxx";
 char const VehicleEntryfmt[] = "niffffiiiiiiiifffffffffffffffssssfifiixx";
 char const VehicleSeatEntryfmt[] = "niiffffffffffiiiiiifffffffiiifffiiiiiiiffiiiiixxxxxxxxxxxxxxxxxxxx";
 char const WMOAreaTableEntryfmt[] = "niiixxxxxiixxxx";

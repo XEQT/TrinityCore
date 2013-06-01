@@ -398,7 +398,6 @@ bool Group::AddMember(Player* player)
 
     player->SetGroupInvite(NULL);
     if (player->GetGroup())
-    if (player)
     {
         if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
             player->SetBattlegroundOrBattlefieldRaid(this, subGroup);
@@ -438,7 +437,6 @@ bool Group::AddMember(Player* player)
     sScriptMgr->OnGroupAddMember(this, player->GetGUID());
 
     if (!IsLeader(player->GetGUID()) && !isBGGroup() && !isBFGroup())
-    if (player)
     {
         // reset the new member's instances, unless he is currently in one of them
         // including raid/heroic instances that they are not permanently bound to!
