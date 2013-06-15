@@ -503,6 +503,8 @@ void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recvData)
 
     recvData >> npcGUID;
 
+    printf("npcGUID ->[%u]\n", npcGUID);
+
     if (!CheckStableMaster(npcGUID))
         return;
 
@@ -874,6 +876,39 @@ void WorldSession::HandleStableSwapPetCallback(PreparedQueryResult result, uint3
     }
     else
         SendStableResult(STABLE_SUCCESS_UNSTABLE);
+}
+
+void WorldSession::HandleStableSwapPet_(WorldPacket& recv_data)
+{
+    TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_SET_PET_SLOT.");
+
+    uint8 new_slot;
+    uint32 pet_number;
+
+    // recv_data >> new_slot >> pet_number >> npcGUID;
+    recv_data >> pet_number >> new_slot;
+
+    printf("pet_number ->[%u]\tNew stable num ->[%u]\n", pet_number, new_slot);
+
+    /*    
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOT_BY_ID);
+
+    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(1, pet_number);
+
+    _stableSwapCallback.SetParam(pet_number);
+    _stableSwapCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
+    */
+    // SendStableResult(STABLE_ERR_STABLE);
+    /*PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS_DETAIL);
+
+    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt8(1, PET_SAVE_FIRST_STABLE_SLOT);
+    stmt->setUInt8(2, PET_SAVE_LAST_STABLE_SLOT);
+
+    _sendStabledPetCallback.SetParam(_player->GetGUID());
+    _sendStabledPetCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
+    */
 }
 
 void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
