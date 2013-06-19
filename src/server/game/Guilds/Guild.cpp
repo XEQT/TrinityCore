@@ -3250,7 +3250,7 @@ void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
                     }
                 }
             }
-            // Added BY XEQT
+
             data.WriteBit(0);
             data.WriteBits(enchantCount, 23);                                       // enchantment count
 

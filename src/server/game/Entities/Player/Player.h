@@ -1324,7 +1324,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateInnerTime (time_t time) { time_inn_enter = time; }
 
         Pet* GetPet() const;
-        Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime);
+        Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, PetSaveMode slotID = PET_SAVE_NOT_IN_SLOT);
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
 
         PhaseMgr& GetPhaseMgr() { return phaseMgr; }
@@ -1504,6 +1504,7 @@ class Player : public Unit, public GridObject<Player>
         bool AddItem(uint32 itemId, uint32 count);
 
         uint32 m_stableSlots;
+        uint32 m_numPets;
 
         /*********************************************************/
         /***                    GOSSIP SYSTEM                  ***/
@@ -2334,6 +2335,14 @@ class Player : public Unit, public GridObject<Player>
         float m_homebindZ;
 
         WorldLocation GetStartPosition() const;
+
+        // current pet slot
+        PetSaveMode _currentPetSlot;
+        uint32 m_petEntry;
+        uint32 _petSlotUsed;
+        void Player::resetPetSlot() { _petSlotUsed = 0; }
+        void setPetSlotUsed(PetSaveMode slot, bool used);
+        PetSaveMode getSlotForNewPet();
 
         // currently visible objects at player client
         typedef std::set<uint64> ClientGUIDs;

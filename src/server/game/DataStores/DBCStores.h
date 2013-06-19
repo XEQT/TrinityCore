@@ -234,7 +234,6 @@ extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
 extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
 extern DBCStorage <WorldSafeLocsEntry>           sWorldSafeLocsStore;
 
-// Added By XEQT
 extern TransportAnimationsByEntry                sTransportAnimationsByEntry;
 extern DBCStorage <TransportAnimationEntry>      sTransportAnimationStore;
 

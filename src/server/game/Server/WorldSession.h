@@ -603,7 +603,7 @@ class WorldSession
         void HandleBuyStableSlot(WorldPacket& recvPacket);
         void HandleStableRevivePet(WorldPacket& recvPacket);
         void HandleStableSwapPet(WorldPacket& recvPacket);
-        void HandleStableSwapPetCallback(PreparedQueryResult result, uint32 petId);
+        void HandleStableSwapPetCallback(PreparedQueryResult result, uint8 petId);
         void HandleStableSwapPet_(WorldPacket& recvPacket);
         void SendTrainerBuyFailed(uint64 guid, uint32 spellId, uint32 reason);
 

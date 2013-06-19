@@ -1204,7 +1204,7 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_sacred_shield();
     new spell_pal_templar_s_verdict();
 
-    // ADDED By XEQT
+    // Just for testing
     new spell_pal_consecration();
     new spell_pal_consecration_aura();
 

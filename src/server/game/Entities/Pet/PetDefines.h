@@ -31,10 +31,15 @@ enum PetType
 // stored in character_pet.slot
 enum PetSaveMode
 {
+    PET_SLOT_FULL_LIST         = -4,                        //Used when there is no slot free for taming
+    PET_SLOT_UNK_SLOT          = -3,                        // Used in some scripts.
+   // PET_SAVE_AS_CURRENT        = -2,
     PET_SAVE_AS_DELETED        = -1,                        // not saved in fact
     PET_SAVE_AS_CURRENT        =  0,                        // in current slot (with player)
     PET_SAVE_FIRST_STABLE_SLOT =  1,
     PET_SAVE_LAST_STABLE_SLOT  =  MAX_PET_STABLES,          // last in DB stable slot index (including), all higher have same meaning as PET_SAVE_NOT_IN_SLOT
+    PET_SLOT_STABLE_FIRST      =  5,
+    PET_SLOT_STABLE_LAST       =  24,
     PET_SAVE_NOT_IN_SLOT       =  100                       // for avoid conflict with stable size grow will use 100
 };
 

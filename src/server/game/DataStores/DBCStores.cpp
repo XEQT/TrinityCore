@@ -230,7 +230,6 @@ TaxiMask sHordeTaxiNodesMask;
 TaxiMask sAllianceTaxiNodesMask;
 TaxiMask sDeathKnightTaxiNodesMask;
 
-// Added By XEQT
 TransportAnimationsByEntry sTransportAnimationsByEntry;
 DBCStorage <TransportAnimationEntry> sTransportAnimationStore(TransportAnimationEntryfmt); 
 
@@ -335,7 +334,6 @@ void LoadDBCStores(const std::string& dataPath)
         }
     }
 
-    // Added By XEQT
     LoadDBC(availableDbcLocales, bad_dbc_files, sAchievementStore,            dbcPath, "Achievement.dbc", &CustomAchievementfmt, &CustomAchievementIndex);//15595
     LoadDBC(availableDbcLocales, bad_dbc_files, sTransportAnimationStore,    dbcPath,"TransportAnimation.dbc");
     for (uint32 i = 0; i < sTransportAnimationStore.GetNumRows(); ++i)

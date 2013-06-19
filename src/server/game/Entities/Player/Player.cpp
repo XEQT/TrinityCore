@@ -1833,9 +1833,13 @@ void Player::Update(uint32 p_time)
 
     Pet* pet = GetPet();
     if (pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityRange()) && !pet->isPossessed())
-    //if (pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityDistance()) && (GetCharmGUID() && (pet->GetGUID() != GetCharmGUID())))
-        RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
-
+    {
+        //if (pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityDistance()) && (GetCharmGUID() && (pet->GetGUID() != GetCharmGUID())))
+        if (pet->getPetType() == HUNTER_PET)
+            RemovePet(pet, _currentPetSlot, true);
+        else
+            RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
+    }
     //we should execute delayed teleports only for alive(!) players
     //because we don't want player's ghost teleported from graveyard
     if (IsHasDelayedTeleport() && IsAlive())
@@ -1906,8 +1910,8 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
     //    "SELECT characters.guid, characters.name, characters.race, characters.class, characters.gender, characters.playerBytes, characters.playerBytes2, characters.level, "
     //     8                9               10                     11                     12                     13                    14
     //    "characters.zone, characters.map, characters.position_x, characters.position_y, characters.position_z, guild_member.guildid, characters.playerFlags, "
-    //    15                    16                   17                     18                   19               20                     21               22
-    //    "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, characters.data, character_banned.guid, characters.slot, character_declinedname.genitive"
+    //    15                    16                   17                     18                   19               20                     21               22                               23                   24
+    //    "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, characters.data, character_banned.guid, characters.slot, character_declinedname.genitive, characters.petentry, character_pet.id"
 
     Field* fields = result->Fetch();
 
@@ -1960,6 +1964,10 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
         customizationFlag = CHAR_CUSTOMIZE_FLAG_FACTION;
     else if (atLoginFlags & AT_LOGIN_CHANGE_RACE)
         customizationFlag = CHAR_CUSTOMIZE_FLAG_RACE;
+
+    // Just testing this
+    // uint32 pet_Entry = fields[23].GetUInt32();
+    // uint32 pet_id = fields[24].GetUInt32();
 
     uint32 petDisplayId = 0;
     uint32 petLevel   = 0;
@@ -17025,8 +17033,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     //"totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, "
     // 46      47      48      49      50      51      52           53         54          55             56
     //"health, power1, power2, power3, power4, power5, instance_id, speccount, activespec, exploredZones, equipmentCache, "
-    // 57           58          59
-    //"knownTitles, actionBars, grantableLevels FROM characters WHERE guid = '%u'", guid);
+    // 57           58          59               60              61
+    //"knownTitles, actionBars, grantableLevels, currentpetslot, petentry FROM characters WHERE guid = '%u'", guid);
     PreparedQueryResult result = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
     if (!result)
     {
@@ -17506,6 +17514,9 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     SetSpecsCount(fields[53].GetUInt8());
     SetActiveSpec(fields[54].GetUInt8());
+    
+    _currentPetSlot = PetSaveMode(fields[60].GetUInt8());
+    m_petEntry = fields[61].GetUInt32();
 
     // sanity check
     if (GetSpecsCount() > MAX_TALENT_SPECS || GetActiveSpec() > MAX_TALENT_SPEC || GetSpecsCount() < MIN_TALENT_SPECS)
@@ -19371,6 +19382,11 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, m_grantableLevels);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
+
+        stmt->setUInt8(index++, uint8(_currentPetSlot));
+        stmt->setUInt32(index++, uint8(m_petEntry));
+
+
         // Index
         stmt->setUInt32(index++, GetGUIDLow());
     }
@@ -19414,7 +19430,8 @@ void Player::SaveToDB(bool create /*=false*/)
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+        pet->SavePetToDB(ToPlayer()->getClass() == CLASS_WARLOCK ? PET_SAVE_NOT_IN_SLOT : _currentPetSlot);
+
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state
@@ -20452,7 +20469,7 @@ Pet* Player::GetPet() const
             return pet;
 
         //there may be a guardian in slot
-        //TC_LOG_ERROR(LOG_FILTER_PLAYER, "Player::GetPet: Pet %u not exist.", GUID_LOPART(pet_guid));
+        TC_LOG_ERROR(LOG_FILTER_PLAYER, "Player::GetPet: Pet %u not exist.", GUID_LOPART(pet_guid));
         //const_cast<Player*>(this)->SetPetGUID(0);
     }
 
@@ -20471,6 +20488,9 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         if (pet->m_removed)
             return;
     }
+
+    if (pet && mode == PET_SAVE_NOT_IN_SLOT && pet->getPetType() == HUNTER_PET)
+        mode = _currentPetSlot;
 
     if (returnreagent && (pet || m_temporaryUnsummonedPetNumber) && !InBattleground())
     {
@@ -25656,7 +25676,11 @@ void Player::UnsummonPetTemporaryIfAny()
         m_oldpetspell = pet->GetUInt32Value(UNIT_CREATED_BY_SPELL);
     }
 
-    RemovePet(pet, PET_SAVE_AS_CURRENT);
+    if (pet->getPetType() == HUNTER_PET)
+        RemovePet(pet, _currentPetSlot);
+    else
+        RemovePet(pet, PET_SAVE_AS_CURRENT);
+
 }
 
 void Player::ResummonPetTemporaryUnSummonedIfAny()
@@ -26926,7 +26950,7 @@ void Player::SendMovementSetCanTransitionBetweenSwimAndFly(bool apply)
 
 void Player::SendMovementSetCollisionHeight(float height)
 {
-    // Added By XEQT
+    // Just for testing
     /*
     static MovementStatusElements const heightElement = MSEExtraFloat;
     Movement::ExtraMovementStatusElement extra(&heightElement);
@@ -26974,11 +26998,18 @@ Guild* Player::GetGuild()
     return guildId ? sGuildMgr->GetGuildById(guildId) : NULL;
 }
 
-Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 duration)
+Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 duration, PetSaveMode slotID)
 {
     Pet* pet = new Pet(this, petType);
+    
+    if(ToPlayer()->getClass() == CLASS_WARLOCK)
+    {
+        slotID = PET_SAVE_NOT_IN_SLOT;
+        ToPlayer()->_currentPetSlot = PET_SAVE_NOT_IN_SLOT;
+        ToPlayer()->setPetSlotUsed(PET_SAVE_NOT_IN_SLOT, true);
+    }
 
-    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry))
+    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false, slotID))
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -27090,6 +27121,47 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 bool Player::CanUseMastery() const
 {
     return HasSpell(MasterySpells[getClass()]);
+}
+
+void Player::setPetSlotUsed(PetSaveMode slot, bool used)
+{
+    if (used)
+        _petSlotUsed |=  (1 << uint32(slot));
+    else
+        _petSlotUsed &= ~(1 << uint32(slot));
+
+}
+
+
+PetSaveMode Player::getSlotForNewPet()
+{
+    // Some changes here.
+    uint8 last_known = 0;
+    // Call Pet Spells.
+    // 883, 83242, 83243, 83244, 83245
+    //  1     2      3      4      5
+    if (HasSpell(83245))
+        last_known = 5;
+    else if (HasSpell(83244))
+        last_known = 4;
+    else if (HasSpell(83243))
+        last_known = 3;
+    else if (HasSpell(83242))
+        last_known = 2;
+    else if (HasSpell(883))
+        last_known = 1;
+
+    for (uint8 i = 0; i < last_known; i++)
+    {    
+        if ((_petSlotUsed & (1 << i)) == 0)
+        {       
+            // _currentPetSlot = PetSaveMode(i);
+            return PetSaveMode(i);
+        }
+    }
+
+    // If there is no slots available, then we should point that out
+    return PET_SLOT_FULL_LIST; //(PetSlot)last_known;
 }
 
 void Player::ReadMovementInfo(WorldPacket& data, MovementInfo* mi, Movement::ExtraMovementStatusElement* extras /*= NULL*/)
