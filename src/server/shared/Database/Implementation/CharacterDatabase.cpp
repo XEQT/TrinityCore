@@ -639,4 +639,12 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_ONLY, "SELECT id, entry, owner, slot, name, PetType FROM character_pet WHERE owner = ? AND id = ?", CONNECTION_BOTH);
     PrepareStatement(CHAR_SEL_CHAR_PET_BY_SLOT_ONLY, "SELECT id, entry, owner, slot, name, PetType FROM character_pet WHERE owner = ? AND slot = ?", CONNECTION_BOTH);
 
+ 
+    // Bot
+    PrepareStatement(CHAR_DEL_NPCBOT, "DELETE FROM character_npcbot WHERE owner = ? AND entry = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_NPCBOTS, "DELETE FROM character_npcbot WHERE owner = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_NPCBOT, "INSERT INTO character_npcbot (owner, entry, race, class, istank) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SEL_MAINTANK, "SELECT memberGuid, memberFlags FROM group_member WHERE guid = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_UPD_NPCBOT_TANK, "UPDATE character_npcbot SET istank = ? WHERE owner = ? AND entry = ?", CONNECTION_ASYNC);
+
 }
