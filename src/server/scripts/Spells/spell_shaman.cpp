@@ -39,6 +39,7 @@ enum ShamanSpells
     SPELL_SHAMAN_EXHAUSTION                     = 57723,
     SPELL_SHAMAN_FIRE_NOVA_TRIGGERED_R1         = 8349,
     SPELL_SHAMAN_FLAME_SHOCK                    = 8050,
+    SPELL_SHAMAN_FOCUSED_INSIGHT                = 77800,
     SPELL_SHAMAN_GLYPH_OF_EARTH_SHIELD          = 63279,
     SPELL_SHAMAN_GLYPH_OF_HEALING_STREAM_TOTEM  = 55456,
     SPELL_SHAMAN_GLYPH_OF_MANA_TIDE             = 55441,
@@ -50,6 +51,7 @@ enum ShamanSpells
     SPELL_SHAMAN_LIGHTNING_SHIELD               = 324,
     SPELL_SHAMAN_SATED                          = 57724,
     SPELL_SHAMAN_STORM_EARTH_AND_FIRE           = 51483,
+    SPELL_SHAMAN_TELLURIC_CURRENTS              = 82987,
     SPELL_SHAMAN_TOTEM_EARTHBIND_EARTHGRAB      = 64695,
     SPELL_SHAMAN_TOTEM_EARTHBIND_TOTEM          = 6474,
     SPELL_SHAMAN_TOTEM_EARTHEN_POWER            = 59566,
@@ -485,6 +487,44 @@ class spell_sha_flame_shock : public SpellScriptLoader
         }
 };
 
+// 77794 - Focused Insight
+class spell_sha_focused_insight : public SpellScriptLoader
+{
+    public:
+        spell_sha_focused_insight() : SpellScriptLoader("spell_sha_focused_insight") { }
+
+        class spell_sha_focused_insight_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_sha_focused_insight_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_FOCUSED_INSIGHT))
+                    return false;
+                return true;
+            }
+
+            void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+            {
+                PreventDefaultAction();
+                int32 basePoints0 = aurEff->GetAmount();
+                int32 basePoints1 = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+
+                GetTarget()->CastCustomSpell(GetTarget(), SPELL_SHAMAN_FOCUSED_INSIGHT, &basePoints0, &basePoints1, &basePoints1, true, NULL, aurEff);
+            }
+
+            void Register()
+            {
+                OnEffectProc += AuraEffectProcFn(spell_sha_focused_insight_AuraScript::HandleEffectProc, EFFECT_0, SPELL_AURA_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_sha_focused_insight_AuraScript();
+        }
+};
+
 // 52041 - Healing Stream Totem
 /// Updated 4.3.4
 class spell_sha_healing_stream_totem : public SpellScriptLoader
@@ -768,6 +808,43 @@ class spell_sha_rolling_thunder : public SpellScriptLoader
         }
 };
 
+// 82984 - Telluric Currents
+class spell_sha_telluric_currents : public SpellScriptLoader
+{
+    public:
+        spell_sha_telluric_currents() : SpellScriptLoader("spell_sha_telluric_currents") { }
+
+        class spell_sha_telluric_currents_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_sha_telluric_currents_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_TELLURIC_CURRENTS))
+                    return false;
+                return true;
+            }
+
+            void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+                int32 basePoints0 = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount());
+
+                GetTarget()->CastCustomSpell(GetTarget(), SPELL_SHAMAN_TELLURIC_CURRENTS, &basePoints0, NULL, NULL, true);
+            }
+
+            void Register()
+            {
+                OnEffectProc += AuraEffectProcFn(spell_sha_telluric_currents_AuraScript::HandleEffectProc, EFFECT_0, SPELL_AURA_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_sha_telluric_currents_AuraScript();
+        }
+};
+
 // 51490 - Thunderstorm
 class spell_sha_thunderstorm : public SpellScriptLoader
 {
@@ -846,6 +923,7 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_feedback();
     new spell_sha_fire_nova();
     new spell_sha_flame_shock();
+    new spell_sha_focused_insight();
     new spell_sha_healing_stream_totem();
     new spell_sha_heroism();
     new spell_sha_lava_lash();
@@ -853,6 +931,7 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_lava_surge_proc();
     new spell_sha_mana_tide_totem();
     new spell_sha_rolling_thunder();
+    new spell_sha_telluric_currents();
     new spell_sha_thunderstorm();
     new spell_sha_tidal_waves();
 }
