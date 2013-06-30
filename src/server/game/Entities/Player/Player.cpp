@@ -2637,7 +2637,7 @@ void Player::RefreshBot(uint32 diff)
         m_bot = NULL;
     }//end for botmap
     //BOT CREATION/RECREATION SUPPORT
-    if (!IsInFlight() && IsAlive() /* && !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && GetBotMustBeCreated() && !RestrictBots()*/)   // MOVEMENTFLAG_ONTRANSPORT
+    if (!IsInFlight() && IsAlive() && !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && GetBotMustBeCreated() && !RestrictBots())   // MOVEMENTFLAG_ONTRANSPORT
     {
         for (uint8 pos = 0; pos != GetMaxNpcBots(); ++pos)
         {   

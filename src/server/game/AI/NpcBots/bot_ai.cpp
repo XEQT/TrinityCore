@@ -39,6 +39,7 @@ bot_minion_ai::bot_minion_ai(Creature* creature): bot_ai(creature)
     evade_cd = 0;
     myangle = 0.f;
     classinfo = new PlayerClassLevelInfo();
+
 }
 bot_minion_ai::~bot_minion_ai()
 {
@@ -1123,8 +1124,9 @@ void bot_pet_ai::setStats(uint8 mylevel, uint8 petType, bool force)
     uint8 botclass = m_creatureOwner->GetBotClass();
     if (botclass == BEAR || botclass == CAT)
         botclass = CLASS_DRUID;
-    //sObjectMgr->GetPlayerClassLevelInfo(botclass, m_creatureOwner->getLevel(), &classinfo);
-    //const CreatureBaseStats* const classstats = sObjectMgr->GetCreatureBaseStats(mylevel, me->GetBotClass());//use creature class
+    // sObjectMgr->GetPlayerClassLevelInfo(botclass, m_creatureOwner->getLevel(), classinfo );
+    // CreatureBaseStats const *classstats = sObjectMgr->GetCreatureBaseStats(mylevel, me->GetBotClass());//use creature class
+    // sObjectMgr->GetPlayerClassLevelInfo(botclass, m_creatureOwner->getLevel(), classstats);
     //if (force)
     //    for (uint8 i = STAT_STRENGTH; i < MAX_STATS; i++)
     //        me->SetCreateStat(Stats(i), master->GetCreateStat(Stats(i))*0.5f);
@@ -1863,7 +1865,16 @@ void bot_minion_ai::UpdateMountedState()
             //creature don't benefit from mount flight speed, so force it
             if (me->GetSpeed(MOVE_FLIGHT) != master->GetSpeed(MOVE_FLIGHT)/2)
             me->SetSpeed(MOVE_FLIGHT, master->GetSpeed(MOVE_FLIGHT)/2);
+            return;
         }
+        /*
+        if ((master->HasAuraType(SPELL_AURA_MOUNTED) && !master->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) &&  !master->HasUnitMovementFlag(MOVEMENTFLAG_FLYING)))
+        {
+
+            me->SetSpeed(MOVE_FLIGHT, master->GetSpeed(MOVE_FLIGHT)/2);
+            return;
+
+        }*/
         return;
     }
     bool aura = me->HasAuraType(SPELL_AURA_MOUNTED);
@@ -1924,6 +1935,7 @@ void bot_minion_ai::UpdateMountedState()
                 me->RemoveAurasDueToSpell(DRINK);
                 me->RemoveAurasDueToSpell(EAT);
             }
+
             if (doCast(me, mount))
             {
                 return;
