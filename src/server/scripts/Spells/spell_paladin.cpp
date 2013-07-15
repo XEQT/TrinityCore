@@ -841,13 +841,13 @@ class spell_pal_sacred_shield : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
-            void Register()
+            void Register() OVERRIDE
             {
                 OnCheckCast += SpellCheckCastFn(spell_pal_sacred_shield_SpellScript::CheckCast);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const OVERRIDE
         {
             return new spell_pal_sacred_shield_SpellScript();
         }
@@ -1088,7 +1088,7 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
                 return true;
             }
 
-            bool Load()
+            bool Load() OVERRIDE
             {
                 if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
                     return false;
