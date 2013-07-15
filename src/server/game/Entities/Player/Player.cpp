@@ -698,20 +698,20 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
     m_botTimer = 0;
     _botHlpr = NULL;
 
-    m_enableNpcBots         = ConfigMgr::GetBoolDefault("Bot.EnableNpcBots", true);
-    m_enableAllNpcBots      = ConfigMgr::GetBoolDefault("Bot.AllowAllClasses", true);
-    m_enableNpcBotsArenas   = ConfigMgr::GetBoolDefault("Bot.EnableInArenas", true);
-    m_enableNpcBotsBGs      = ConfigMgr::GetBoolDefault("Bot.EnableInBGs ", true);
-    m_enableNpcBotsDungeons = ConfigMgr::GetBoolDefault("Bot.EnableInDungeons", true);
-    m_enableNpcBotsRaids    = ConfigMgr::GetBoolDefault("Bot.EnableInRaids", true);
-    m_limitNpcBotsDungeons  = ConfigMgr::GetBoolDefault("Bot.InstanceLimit.Dungeons", false);
-    m_limitNpcBotsRaids     = ConfigMgr::GetBoolDefault("Bot.InstanceLimit.Raids", false);
-    m_maxNpcBots            = ConfigMgr::GetIntDefault("Bot.MaxNpcBots", 1);
-    m_maxClassNpcBots       = ConfigMgr::GetIntDefault("Bot.MaxNpcBotsPerClass", 1);
-    m_xpReductionNpcBots    = ConfigMgr::GetIntDefault("Bot.XpReductionPercent", 0);
-    m_numBots               = ConfigMgr::GetIntDefault("Bot.MaxNpcBots", 1);
-    m_followdist            = ConfigMgr::GetIntDefault("Bot.BaseFollowDistance", 30);
-    m_NpcBotsCost           = ConfigMgr::GetIntDefault("Bot.Cost", 0);
+    m_enableNpcBots         = sConfigMgr->GetBoolDefault("Bot.EnableNpcBots", true);
+    m_enableAllNpcBots      = sConfigMgr->GetBoolDefault("Bot.AllowAllClasses", true);
+    m_enableNpcBotsArenas   = sConfigMgr->GetBoolDefault("Bot.EnableInArenas", true);
+    m_enableNpcBotsBGs      = sConfigMgr->GetBoolDefault("Bot.EnableInBGs ", true);
+    m_enableNpcBotsDungeons = sConfigMgr->GetBoolDefault("Bot.EnableInDungeons", true);
+    m_enableNpcBotsRaids    = sConfigMgr->GetBoolDefault("Bot.EnableInRaids", true);
+    m_limitNpcBotsDungeons  = sConfigMgr->GetBoolDefault("Bot.InstanceLimit.Dungeons", false);
+    m_limitNpcBotsRaids     = sConfigMgr->GetBoolDefault("Bot.InstanceLimit.Raids", false);
+    m_maxNpcBots            = sConfigMgr->GetIntDefault("Bot.MaxNpcBots", 1);
+    m_maxClassNpcBots       = sConfigMgr->GetIntDefault("Bot.MaxNpcBotsPerClass", 1);
+    m_xpReductionNpcBots    = sConfigMgr->GetIntDefault("Bot.XpReductionPercent", 0);
+    m_numBots               = sConfigMgr->GetIntDefault("Bot.MaxNpcBots", 1);
+    m_followdist            = sConfigMgr->GetIntDefault("Bot.BaseFollowDistance", 30);
+    m_NpcBotsCost           = sConfigMgr->GetIntDefault("Bot.Cost", 0);
     // End XEQT
 
     // players always accept

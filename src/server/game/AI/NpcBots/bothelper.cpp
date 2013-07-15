@@ -125,7 +125,7 @@ bool BotHelper::OnGossipHello(Player* player)
 
     uint8 maxNBcount = player->GetMaxNpcBots();
 
-    bool allowNBots = ConfigMgr::GetBoolDefault("Bot.EnableNpcBots", true) && !player->RestrictBots();
+    bool allowNBots = sConfigMgr->GetBoolDefault("Bot.EnableNpcBots", true) && !player->RestrictBots();
 
     std::string tempstr;
 
@@ -330,7 +330,7 @@ void BotHelper::SendBotHelpWhisper(Player* player, uint32 /*action*/)
     ch.SendSysMessage(msg2.c_str());
     ch.SendSysMessage(msg3.c_str());
     //Heal Icons
-    uint8 mask = ConfigMgr::GetIntDefault("Bot.HealTargetIconsMask", 8);
+    uint8 mask = sConfigMgr->GetIntDefault("Bot.HealTargetIconsMask", 8);
     std::string msg4 = "";
     if (mask == 255)
     {

@@ -78,15 +78,15 @@ bot_ai::bot_ai(Creature* creature) : ScriptedAI(creature)
     pos.m_positionZ = 0.f;
     aftercastTargetGuid = 0;
     currentSpell = 0;
-    dmgmult_melee = ConfigMgr::GetFloatDefault("Bot.DamageMult.Melee", 1.0);
-    dmgmult_spell = ConfigMgr::GetFloatDefault("Bot.DamageMult.Spell", 1.0);
+    dmgmult_melee = sConfigMgr->GetFloatDefault("Bot.DamageMult.Melee", 1.0);
+    dmgmult_spell = sConfigMgr->GetFloatDefault("Bot.DamageMult.Spell", 1.0);
     dmgmult_melee = std::max(dmgmult_melee, 0.01f);
     dmgmult_spell = std::max(dmgmult_spell, 0.01f);
     dmgmult_melee = std::min(dmgmult_melee, 10.f);
     dmgmult_spell = std::min(dmgmult_spell, 10.f);
     dmgmod_melee = Creature::_GetDamageMod(me->GetCreatureTemplate()->rank);
     dmgmod_spell = me->GetSpellDamageMod(me->GetCreatureTemplate()->rank);
-    healTargetIconFlags = ConfigMgr::GetIntDefault("Bot.HealTargetIconsMask", 8);
+    healTargetIconFlags = sConfigMgr->GetIntDefault("Bot.HealTargetIconsMask", 8);
 }
 bot_ai::~bot_ai(){}
 

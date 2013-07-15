@@ -1142,7 +1142,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     m_playerLoading = false;
 
     //the only place where we check if it has NPC bots
-    if (ConfigMgr::GetBoolDefault("Bot.EnableNpcBots", true))
+    if (sConfigMgr->GetBoolDefault("Bot.EnableNpcBots", true))
     {
         if (QueryResult result = CharacterDatabase.PQuery("SELECT entry,race,class,istank FROM `character_npcbot` WHERE `owner` = '%u'", pCurrChar->GetGUIDLow()))
         {
