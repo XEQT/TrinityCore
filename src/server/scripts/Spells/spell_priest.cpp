@@ -721,6 +721,7 @@ class spell_pri_renew : public SpellScriptLoader
                 return true;
             }
 
+            bool Load()
             {
                 if (GetCaster() && GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->ToCreature()->GetIAmABot()) return true;
                 return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
