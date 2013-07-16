@@ -2861,6 +2861,7 @@ class Player : public Unit, public GridObject<Player>
         Creature* m_bot;
         int8 m_followdist;
         uint64 m_botTankGuid;
+
         uint8 m_maxNpcBots;
         uint8 m_maxClassNpcBots;
         uint8 m_xpReductionNpcBots;
@@ -2874,6 +2875,7 @@ class Player : public Unit, public GridObject<Player>
         bool m_limitNpcBotsDungeons;
         bool m_limitNpcBotsRaids;
         uint32 m_NpcBotsCost;
+        
         uint32 m_botTimer;
         NpcBotMap* m_botmap[MAX_NPCBOTS];
         /*********************************************************/

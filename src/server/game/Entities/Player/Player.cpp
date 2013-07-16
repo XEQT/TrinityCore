@@ -692,7 +692,7 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
     //m_pad = 0;
 
     // Added BY XEQT
-    for (uint8 i=0; i < MAX_NPCBOTS; i++)
+   /* for (uint8 i=0; i < MAX_NPCBOTS; i++)
         m_botmap[i] = new NpcBotMap;
 
     m_botTimer = 0;
@@ -712,7 +712,32 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
     m_numBots               = sConfigMgr->GetIntDefault("Bot.MaxNpcBots", 1);
     m_followdist            = sConfigMgr->GetIntDefault("Bot.BaseFollowDistance", 30);
     m_NpcBotsCost           = sConfigMgr->GetIntDefault("Bot.Cost", 0);
+    */
     // End XEQT
+
+    ///////////////////// Bot System ////////////////////////
+    _botHlpr = NULL;
+    //Npcbot
+    m_botTimer = 500;
+    m_bot = NULL;
+    m_botTankGuid = 0;
+    m_enableNpcBots = sConfigMgr->GetBoolDefault("Bot.EnableNpcBots", true);
+    m_followdist = sConfigMgr->GetIntDefault("Bot.BaseFollowDistance", 30);
+    m_maxNpcBots = std::min<uint8>(sConfigMgr->GetIntDefault("Bot.MaxNpcBots", 1), MAX_NPCBOTS);
+    uint8 maxcbots = sConfigMgr->GetIntDefault("Bot.MaxNpcBotsPerClass", 1);
+    m_maxClassNpcBots = maxcbots > 0 ? maxcbots : MAX_NPCBOTS;
+    m_xpReductionNpcBots = std::min<uint8>(sConfigMgr->GetIntDefault("Bot.XpReductionPercent", 0), 100);
+    m_enableAllNpcBots = sConfigMgr->GetBoolDefault("Bot.AllowAllClasses", false);
+    m_enableNpcBotsArenas = sConfigMgr->GetBoolDefault("Bot.EnableInArenas", true);
+    m_enableNpcBotsBGs = sConfigMgr->GetBoolDefault("Bot.EnableInBGs", true);
+    m_enableNpcBotsDungeons = sConfigMgr->GetBoolDefault("Bot.EnableInDungeons", true);
+    m_enableNpcBotsRaids = sConfigMgr->GetBoolDefault("Bot.EnableInRaids", true);
+    m_limitNpcBotsDungeons = sConfigMgr->GetBoolDefault("Bot.InstanceLimit.Dungeons", false);
+    m_limitNpcBotsRaids = sConfigMgr->GetBoolDefault("Bot.InstanceLimit.Raids", false);
+    m_NpcBotsCost = sConfigMgr->GetIntDefault("Bot.Cost", 0);
+    for (uint8 i = 0; i != GetMaxNpcBots(); ++i)
+        m_botmap[i] = new NpcBotMap();
+    ///////////////////// End Bot System ////////////////////////
 
     // players always accept
     if (!GetSession()->HasPermission(RBAC_PERM_CAN_FILTER_WHISPERS))

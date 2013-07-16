@@ -1277,6 +1277,22 @@ void World::LoadConfigSettings(bool reload)
     // call ScriptMgr if we're reloading the configuration
     if (reload)
         sScriptMgr->OnConfigLoad(reload);
+    /*
+    m_enableNpcBots         = sConfigMgr->GetBoolDefault("Bot.EnableNpcBots", true);
+    m_enableAllNpcBots      = sConfigMgr->GetBoolDefault("Bot.AllowAllClasses", true);
+    m_enableNpcBotsArenas   = sConfigMgr->GetBoolDefault("Bot.EnableInArenas", true);
+    m_enableNpcBotsBGs      = sConfigMgr->GetBoolDefault("Bot.EnableInBGs ", true);
+    m_enableNpcBotsDungeons = sConfigMgr->GetBoolDefault("Bot.EnableInDungeons", true);
+    m_enableNpcBotsRaids    = sConfigMgr->GetBoolDefault("Bot.EnableInRaids", true);
+    m_limitNpcBotsDungeons  = sConfigMgr->GetBoolDefault("Bot.InstanceLimit.Dungeons", false);
+    m_limitNpcBotsRaids     = sConfigMgr->GetBoolDefault("Bot.InstanceLimit.Raids", false);
+    m_maxNpcBots            = sConfigMgr->GetIntDefault("Bot.MaxNpcBots", 1);
+    m_maxClassNpcBots       = sConfigMgr->GetIntDefault("Bot.MaxNpcBotsPerClass", 1);
+    m_xpReductionNpcBots    = sConfigMgr->GetIntDefault("Bot.XpReductionPercent", 0);
+    m_numBots               = sConfigMgr->GetIntDefault("Bot.MaxNpcBots", 1);
+    m_followdist            = sConfigMgr->GetIntDefault("Bot.BaseFollowDistance", 30);
+    m_NpcBotsCost           = sConfigMgr->GetIntDefault("Bot.Cost", 0);
+    */
 }
 
 extern void LoadGameObjectModelList();
