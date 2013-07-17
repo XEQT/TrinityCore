@@ -39,7 +39,6 @@ bot_minion_ai::bot_minion_ai(Creature* creature): bot_ai(creature)
     evade_cd = 0;
     myangle = 0.f;
     classinfo = new PlayerClassLevelInfo();
-
 }
 bot_minion_ai::~bot_minion_ai()
 {
@@ -275,6 +274,9 @@ void bot_minion_ai::CalculatePos(Position & pos)
 // Movement set
 void bot_minion_ai::SetBotCommandState(CommandStates st, bool force, Position* newpos)
 {
+    Position pos2;
+    master->GetPosition(&pos2);
+    
     if (me->isDead() || IAmDead())
         return;
     if (st == COMMAND_FOLLOW && ((!me->isMoving() && !IsCasting() && master->IsAlive()) || force))
@@ -288,10 +290,15 @@ void bot_minion_ai::SetBotCommandState(CommandStates st, bool force, Position* n
             pos.m_positionY = newpos->m_positionY;
             pos.m_positionZ = newpos->m_positionZ;
         }
+        // New test i did for the bot with movements
         if (me->getStandState() == UNIT_STAND_STATE_SIT && !Feasting())
             me->SetStandState(UNIT_STAND_STATE_STAND);
-        me->GetMotionMaster()->MovePoint(master->GetMapId(), pos);
-        //me->GetMotionMaster()->MoveFollow(master, mydist, angle);
+        // me->GetMotionMaster()->MovePoint(master->GetMapId(), pos);
+        float X_(0), Y_(0), Z_(0);
+        me->GetMotionMaster()->GetDestination(X_, Y_, Z_);
+        CalculatePos(pos2);
+        if ((me->GetPositionX() == X_ && me->GetPositionY() == Y_ && me->GetPositionZ() == Z_) || X_ == 0.f && Y_ == 0.f && Z_ == 0.f)
+            me->GetMotionMaster()->MovePoint(master->GetMapId(), pos2);
     }
     else if (st == COMMAND_STAY)
     {
@@ -1867,14 +1874,6 @@ void bot_minion_ai::UpdateMountedState()
             me->SetSpeed(MOVE_FLIGHT, master->GetSpeed(MOVE_FLIGHT)/2);
             return;
         }
-        /*
-        if ((master->HasAuraType(SPELL_AURA_MOUNTED) && !master->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) &&  !master->HasUnitMovementFlag(MOVEMENTFLAG_FLYING)))
-        {
-
-            me->SetSpeed(MOVE_FLIGHT, master->GetSpeed(MOVE_FLIGHT)/2);
-            return;
-
-        }*/
         return;
     }
     bool aura = me->HasAuraType(SPELL_AURA_MOUNTED);
@@ -1935,7 +1934,7 @@ void bot_minion_ai::UpdateMountedState()
                 me->RemoveAurasDueToSpell(DRINK);
                 me->RemoveAurasDueToSpell(EAT);
             }
-
+            
             if (doCast(me, mount))
             {
                 return;
