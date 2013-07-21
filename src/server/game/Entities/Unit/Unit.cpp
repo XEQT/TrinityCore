@@ -5570,23 +5570,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         }
         case SPELLFAMILY_PRIEST:
         {
-            // Vampiric Touch
-            if (dummySpell->SpellFamilyFlags[1] & 0x00000400)
-            {
-                if (!victim || !victim->IsAlive())
-                    return false;
-
-                if (effIndex != 0)
-                    return false;
-
-                // victim is caster of aura
-                if (triggeredByAura->GetCasterGUID() != victim->GetGUID())
-                    return false;
-
-                // Energize 1% of max. mana
-                victim->CastSpell(victim, 57669, true, castItem, triggeredByAura);
-                return true;                                // no hidden cooldown
-            }
             // Body and Soul
             if (dummySpell->SpellIconID == 2218)
             {
@@ -5612,16 +5595,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         return false;
 
                     target = this;
-                    break;
-                }
-                // Phantasm
-                case 47569:
-                case 47570:
-                {
-                    if (!roll_chance_i(triggerAmount))
-                        return false;
-
-                    RemoveMovementImpairingAuras();
                     break;
                 }
                 // Oracle Healing Bonus ("Garments of the Oracle" set)
@@ -5670,17 +5643,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
-                // Glyph of Innervate
-                case 54832:
-                {
-                    if (procSpell->SpellIconID != 62)
-                        return false;
-
-                    basepoints0 = int32(CalculatePct(GetCreatePowers(POWER_MANA), triggerAmount) / 5);
-                    triggered_spell_id = 54833;
-                    target = this;
-                    break;
-                }
                 // Glyph of Starfire
                 case 54845:
                 {
