@@ -363,11 +363,15 @@ void TradeData::SetSpell(uint32 spell_id, Item* castItem /*= NULL*/)
     m_spell = spell_id;
     m_spellCastItem = itemGuid;
 
+    if(castItem && spell_id > 0)
+        castItem->SetEnchantment(PERM_ENCHANTMENT_SLOT, spell_id, 0, 0, m_player->GetGUID());
+
     SetAccepted(false);
     GetTraderData()->SetAccepted(false);
 
     Update(true);                                           // send spell info to item owner
     Update(false);                                          // send spell info to caster self
+
 }
 
 void TradeData::SetMoney(uint64 money)
@@ -385,16 +389,15 @@ void TradeData::SetMoney(uint64 money)
 
 void TradeData::Update(bool forTarget /*= true*/)
 {
-    if (forTarget)
+   // if (forTarget)
         m_trader->GetSession()->SendUpdateTrade(true);      // player state for trader
-    else
-        m_player->GetSession()->SendUpdateTrade(false);     // player state for player
+   // else
+   //     m_player->GetSession()->SendUpdateTrade(false);     // player state for player
 }
 
 void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 {
     m_accepted = state;
-
     if (!state)
     {
         if (crosssend)
@@ -7615,8 +7618,9 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation, bool t
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
     if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
+    {
         GetSession()->SendCancelTrade();
-
+    }
     CheckAreaExploreAndOutdoor();
 
     return true;
@@ -27886,12 +27890,12 @@ void Player::SendMovementSetCanTransitionBetweenSwimAndFly(bool apply)
 void Player::SendMovementSetCollisionHeight(float height)
 {
     // Just for testing XEQT
-    
+    /*
     static MovementStatusElements const heightElement = MSEExtraFloat;
     Movement::ExtraMovementStatusElement extra(&heightElement);
     extra.Data.floatData = height;
     Movement::PacketSender(this, NULL_OPCODE, SMSG_MOVE_SET_COLLISION_HEIGHT, SMSG_MOVE_UPDATE_COLLISION_HEIGHT, &extra).Send();
-    
+    */
 }
 
 float Player::GetCollisionHeight(bool mounted) const

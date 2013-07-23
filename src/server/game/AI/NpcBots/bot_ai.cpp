@@ -274,31 +274,32 @@ void bot_minion_ai::CalculatePos(Position & pos)
 // Movement set
 void bot_minion_ai::SetBotCommandState(CommandStates st, bool force, Position* newpos)
 {
-    Position pos2;
-    master->GetPosition(&pos2);
-    
     if (me->isDead() || IAmDead())
         return;
     if (st == COMMAND_FOLLOW && ((!me->isMoving() && !IsCasting() && master->IsAlive()) || force))
     {
         if (CCed(me, true)/* || master->HasUnitState(UNIT_STATE_FLEEING)*/) return;
-        if (!newpos)
+       /* if (!newpos)
             CalculatePos(pos);
         else
         {
             pos.m_positionX = newpos->m_positionX;
             pos.m_positionY = newpos->m_positionY;
             pos.m_positionZ = newpos->m_positionZ;
-        }
+        }*/
         // New test i did for the bot with movements
         if (me->getStandState() == UNIT_STAND_STATE_SIT && !Feasting())
             me->SetStandState(UNIT_STAND_STATE_STAND);
         // me->GetMotionMaster()->MovePoint(master->GetMapId(), pos);
         float X_(0), Y_(0), Z_(0);
         me->GetMotionMaster()->GetDestination(X_, Y_, Z_);
-        CalculatePos(pos2);
-        if ((me->GetPositionX() == X_ && me->GetPositionY() == Y_ && me->GetPositionZ() == Z_) || X_ == 0.f && Y_ == 0.f && Z_ == 0.f)
+        if ((me->GetPositionX() == X_ && me->GetPositionY() == Y_ && me->GetPositionZ() == Z_) || (X_ == 0.f && Y_ == 0.f && Z_ == 0.f))
+        {
+            Position pos2;
+            master->GetPosition(&pos2);
+            CalculatePos(pos2);
             me->GetMotionMaster()->MovePoint(master->GetMapId(), pos2);
+        }
     }
     else if (st == COMMAND_STAY)
     {

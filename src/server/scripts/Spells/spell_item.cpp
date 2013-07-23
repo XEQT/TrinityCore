@@ -2546,6 +2546,66 @@ class spell_item_desperate_defense : public SpellScriptLoader
         }
 };
 
+// Poison for rouge
+enum poison_type
+{
+    SPELL_DEADLY_POISON     = 2823,
+    SPELL_DEADLY_POISON_AURA  = 2818
+};
+
+class spell_item_poison : public SpellScriptLoader
+{
+    public:
+        spell_item_poison(char const* name, uint8 chance, uint32 failSpell = 0) : SpellScriptLoader(name), _chance(chance), _failSpell(failSpell) { }
+
+        class spell_item_poison_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_poison_SpellScript);
+
+        public:
+            spell_item_poison_SpellScript(uint8 chance, uint32 failSpell) : SpellScript(), _chance(chance), _failSpell(failSpell) { }
+
+            bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
+            {
+                // if (_failSpell && !sSpellMgr->GetSpellInfo(_failSpell))
+                //    return false;
+                printf("We Loaded the ITEM script for poison !!\n");
+                return true;
+            }
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                printf("We hit the target !!\n");
+                if (roll_chance_i(_chance))
+                {
+                    PreventHitDefaultEffect(effIndex);
+                    // if (_failSpell)
+                    // GetCaster()->CastSpell(GetCaster(), _failSpell, true, GetCastItem());
+                    GetCaster()->CastSpell(GetHitUnit(), SPELL_DEADLY_POISON_AURA, true, GetCastItem());
+
+                }
+            }
+
+            void Register() OVERRIDE
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_item_poison_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+
+        private:
+            uint8 _chance;
+            uint32 _failSpell;
+        };
+
+        SpellScript* GetSpellScript() const OVERRIDE
+        {
+            return new spell_item_poison_SpellScript(_chance, _failSpell);
+        }
+
+    private:
+        uint8 _chance;
+        uint32 _failSpell;
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -2556,6 +2616,8 @@ void AddSC_item_spell_scripts()
     new spell_item_trigger_spell("spell_item_mechanical_dragonling", SPELL_MECHANICAL_DRAGONLING);
     // 23075 Mithril Mechanical Dragonling
     new spell_item_trigger_spell("spell_item_mithril_mechanical_dragonling", SPELL_MITHRIL_MECHANICAL_DRAGONLING);
+
+    // new spell_item_trigger_spell("spell_item_deadly_poison", SPELL_DEADLY_POISON);
 
     new spell_item_arcane_shroud();
     new spell_item_blessing_of_ancient_kings();
@@ -2612,4 +2674,6 @@ void AddSC_item_spell_scripts()
     new spell_item_greatmothers_soulcatcher();
     new spell_item_aegis_of_preservation();
     new spell_item_desperate_defense();
+    new spell_item_poison("spell_item_deadly_poison", 100);
+
 }

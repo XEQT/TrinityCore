@@ -84,15 +84,14 @@ void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
 {
+    // trader_data = true;
     TradeData* view_trade = trader_data ? _player->GetTradeData()->GetTraderData() : _player->GetTradeData();
-
+    view_trade = _player->GetTradeData()->GetTraderData();
     ByteBuffer itemData(7*2 + 7*4 + 3*4 + 3*4 + 1);
-
     uint8 count = 0;
     for (uint8 i = 0; i < TRADE_SLOT_COUNT; ++i)
         if (view_trade->GetItem(TradeSlots(i)))
             ++count;
-
     WorldPacket data(SMSG_TRADE_STATUS_EXTENDED, 4*6 + 8 + 1 + 3 + count * 70);
     data << uint32(0);                                      // this value must be equal to value from TRADE_STATUS_OPEN_WINDOW status packet (different value for different players to block multiple trades?)
     data << uint32(0);                                      // unk 2
@@ -117,7 +116,6 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
         data.WriteBit(giftCreatorGuid[1]);
         bool notWrapped = data.WriteBit(!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED));
         data.WriteBit(giftCreatorGuid[3]);
-
         if (notWrapped)
         {
             data.WriteBit(creatorGuid[7]);
@@ -131,6 +129,7 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
             data.WriteBit(creatorGuid[0]);
 
             itemData.WriteByteSeq(creatorGuid[1]);
+            printf("\tWorldSession::SendUpdateTrade => enchanted [%u]\n", item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
 
             itemData << uint32(item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
             for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT+MAX_GEM_SOCKETS /*3*/; ++enchant_slot)
@@ -614,7 +613,7 @@ void WorldSession::SendCancelTrade()
     SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
 }
 
-void WorldSession::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
+void WorldSession::HandleCancelTradeOpcode(WorldPacket& /* recvPacket */ )
 {
     // sent also after LOGOUT COMPLETE
     if (_player)                                             // needed because STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT
@@ -839,4 +838,5 @@ void WorldSession::HandleClearTradeItemOpcode(WorldPacket& recvPacket)
         return;
 
     my_trade->SetItem(TradeSlots(tradeSlot), NULL);
+
 }

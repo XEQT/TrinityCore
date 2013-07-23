@@ -2690,7 +2690,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
         return;
 
     uint32 enchant_id = m_spellInfo->Effects[effIndex].MiscValue;
-
+    printf("Setting up Enchant id [%u]\n", enchant_id);
     if (!enchant_id)
     {
         TC_LOG_ERROR(LOG_FILTER_SPELLS_AURAS, "Spell %u Effect %u (SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY) have 0 as enchanting id", m_spellInfo->Id, effIndex);
@@ -2703,6 +2703,8 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
         TC_LOG_ERROR(LOG_FILTER_SPELLS_AURAS, "Spell %u Effect %u (SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY) have not existed enchanting id %u ", m_spellInfo->Id, effIndex, enchant_id);
         return;
     }
+
+    printf("Setting up spell id [%u]\tAura => [%u]\tLevel => [%u]\tRequierdLevel => [%u]\n", pEnchant->spellid[0], pEnchant->aura_id, pEnchant->amount[0], pEnchant->requiredSkillValue);
 
     // select enchantment duration
     uint32 duration;
@@ -2753,6 +2755,12 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 
     // add new enchanting if equipped
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, true);
+    
+    if(pEnchant->aura_id != 0)
+    {
+        item_owner->CastSpell(item_owner, pEnchant->aura_id, true, itemTarget);
+        printf("Adding Aura\n");
+    }
 }
 
 void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)

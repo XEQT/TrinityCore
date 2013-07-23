@@ -204,23 +204,51 @@ class spell_rog_deadly_poison : public SpellScriptLoader
             {
                 _stackAmount = 0;
                 // at this point CastItem must already be initialized
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCastItem();
+                return GetCaster()->GetTypeId() == TYPEID_PLAYER; // && GetCastItem();
+            }
+
+            bool Validate(SpellInfo const* /*spellInfo*/) OVERRIDE
+            {
+                if (!sSpellMgr->GetSpellInfo(2818) && !sSpellMgr->GetSpellInfo(2823) && !sSpellMgr->GetSpellInfo(38615) && !sSpellMgr->GetSpellInfo(38616))
+                    return false;
+                
+                return true;
             }
 
             void HandleBeforeHit()
             {
                 if (Unit* target = GetHitUnit())
-                    // Deadly Poison
+                {    // Deadly Poison
                     if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x10000, 0x80000, 0, GetCaster()->GetGUID()))
                         _stackAmount = aurEff->GetBase()->GetStackAmount();
+                }
             }
 
             void HandleAfterHit()
             {
+                Player* player = GetCaster()->ToPlayer();
+                /*
+                int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+                // player->CastCustomSpell(player, 38615, &bp, 0, 0, true);
+                // player->CastCustomSpell(player, 744, &bp, 0, 0, true);
+                // player->CastSpell(player, 744, true);
+                  
+                Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+
+                if (item == GetCastItem())
+                    item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+                
+                if (item)
+                {
+                    printf("Name of Char [%s]\n", item->GetOwner()->GetName().c_str());
+                    printf("Enchantment => [%u]\n", item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT));
+                    // printf("Spell_ID => [%u]\n", GetEnchantmentId(TEMP_ENCHANTMENT_SLOT));
+                    item->SendUpdateSockets();
+                }
+                */
+                
                 if (_stackAmount < 5)
                     return;
-
-                Player* player = GetCaster()->ToPlayer();
 
                 if (Unit* target = GetHitUnit())
                 {
@@ -272,10 +300,36 @@ class spell_rog_deadly_poison : public SpellScriptLoader
                 }
             }
 
+            void HitTarget (SpellEffIndex /*effIndex*/) 
+            {
+                Unit* caster = GetCaster();
+                // Player* caster = GetCaster()->ToPlayer();
+                Unit* target = GetHitUnit();
+                if (target)
+                    printf("name: [%s]", target->GetName().c_str());
+                
+                if (Unit* unitTarget = GetHitUnit())
+                    caster->CastSpell(unitTarget, 2818, true);
+            }
+
+            void HitTarget_ () 
+            {
+                Unit* caster = GetCaster();
+                // Player* caster = GetCaster()->ToPlayer();
+                Unit* target = GetHitUnit();
+                if (target)
+                    printf("name: [%s]", target->GetName().c_str());
+                
+                if (Unit* unitTarget = GetHitUnit())
+                    caster->CastSpell(unitTarget, 2818, true);
+            }
+
             void Register() OVERRIDE
             {
                 BeforeHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HandleBeforeHit);
                 AfterHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HandleAfterHit);
+                OnEffectHitTarget += SpellEffectFn(spell_rog_deadly_poison_SpellScript::HitTarget, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+                OnHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HitTarget_);
             }
 
             uint8 _stackAmount;
@@ -286,6 +340,7 @@ class spell_rog_deadly_poison : public SpellScriptLoader
             return new spell_rog_deadly_poison_SpellScript();
         }
 };
+
 
 // 31130 - Nerves of Steel
 class spell_rog_nerves_of_steel : public SpellScriptLoader
@@ -682,6 +737,8 @@ void AddSC_rogue_spell_scripts()
     new spell_rog_cheat_death();
     new spell_rog_cut_to_the_chase();
     new spell_rog_deadly_poison();
+    new spell_rog_deadly_poison_attack();
+    new spell_rog_deadly_poison_aura();
     new spell_rog_nerves_of_steel();
     new spell_rog_preparation();
     new spell_rog_prey_on_the_weak();
