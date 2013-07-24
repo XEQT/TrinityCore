@@ -44,7 +44,7 @@ enum PaladinSpells
     SPELL_PALADIN_FORBEARANCE                    = 25771,
     SPELL_PALADIN_GLYPH_OF_SALVATION             = 63225,
     SPELL_PALADIN_HAND_OF_SACRIFICE              = 6940,
-    SPELL_PALADIN_DIVINE_SACRIFICE               = 64205,
+    // SPELL_PALADIN_DIVINE_SACRIFICE               = 64205,
     SPELL_PALADIN_HOLY_SHOCK_R1                  = 20473,
 
     DUMMY_CONSECRATION                           = 226,
@@ -54,7 +54,7 @@ enum PaladinSpells
     AURA_CONSECRATIION_DAMAGE                    = 81298,
     TRIGGER_CONSECRATION                         = 82366,
 
-    SPELL_PALADIN_DIVINE_PURPOSE_PROC            = 90174,
+    // SPELL_PALADIN_DIVINE_PURPOSE_PROC            = 90174,
 
     SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE           = 25912,
     SPELL_PALADIN_HOLY_SHOCK_R1_HEALING          = 25914,
