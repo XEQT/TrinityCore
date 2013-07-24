@@ -29,30 +29,23 @@
 
 enum PaladinSpells
 {
-    SPELL_PALADIN_DIVINE_PLEA                    = 54428,
-
-    SPELL_PALADIN_HOLY_SHOCK_R1                  = 20473,
-    SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE           = 25912,
-    SPELL_PALADIN_HOLY_SHOCK_R1_HEALING          = 25914,
-
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_DRUID   = 37878,
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_PALADIN = 37879,
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_PRIEST  = 37880,
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_SHAMAN  = 37881,
-
+    SPELL_PALADIN_DIVINE_PLEA                    = 54428,
+    SPELL_PALADIN_DIVINE_PURPOSE_PROC            = 90174,
+    SPELL_PALADIN_DIVINE_SACRIFICE               = 64205,
     SPELL_PALADIN_DIVINE_STORM                   = 53385,
     SPELL_PALADIN_DIVINE_STORM_DUMMY             = 54171,
     SPELL_PALADIN_DIVINE_STORM_HEAL              = 54172,
-
     SPELL_PALADIN_EYE_FOR_AN_EYE_RANK_1          = 9799,
     SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE          = 25997,
-
     SPELL_PALADIN_FORBEARANCE                    = 25771,
-    SPELL_PALADIN_AVENGING_WRATH_MARKER          = 61987,
-    SPELL_PALADIN_IMMUNE_SHIELD_MARKER           = 61988,
-
+    SPELL_PALADIN_GLYPH_OF_SALVATION             = 63225,
     SPELL_PALADIN_HAND_OF_SACRIFICE              = 6940,
     SPELL_PALADIN_DIVINE_SACRIFICE               = 64205,
+    SPELL_PALADIN_HOLY_SHOCK_R1                  = 20473,
 
     DUMMY_CONSECRATION                           = 226,
     SPELL_CONSECRATION                           = 26573,
@@ -63,14 +56,16 @@ enum PaladinSpells
 
     SPELL_PALADIN_DIVINE_PURPOSE_PROC            = 90174,
 
+    SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE           = 25912,
+    SPELL_PALADIN_HOLY_SHOCK_R1_HEALING          = 25914,
+    SPELL_PALADIN_IMMUNE_SHIELD_MARKER           = 61988,
     SPELL_PALADIN_ITEM_HEALING_TRANCE            = 37706,
-
-    SPELL_PALADIN_GLYPH_OF_SALVATION             = 63225,
-
     SPELL_PALADIN_RIGHTEOUS_DEFENSE_TAUNT        = 31790,
+    SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742
+};
 
-    SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742,
-
+enum MiscSpells
+{
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
     SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
 
@@ -676,7 +671,7 @@ class spell_pal_judgement_of_command : public SpellScriptLoader
         }
 };
 
-// -633 - Lay on Hands
+// 633 - Lay on Hands
 class spell_pal_lay_on_hands : public SpellScriptLoader
 {
     public:
@@ -688,11 +683,8 @@ class spell_pal_lay_on_hands : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spell*/) OVERRIDE
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_FORBEARANCE))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_AVENGING_WRATH_MARKER))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_IMMUNE_SHIELD_MARKER))
+                if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_FORBEARANCE) ||
+                    !sSpellMgr->GetSpellInfo(SPELL_PALADIN_IMMUNE_SHIELD_MARKER))
                     return false;
                 return true;
             }
@@ -702,8 +694,11 @@ class spell_pal_lay_on_hands : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 if (Unit* target = GetExplTargetUnit())
                     if (caster == target)
-                        if (target->HasAura(SPELL_PALADIN_FORBEARANCE) || target->HasAura(SPELL_PALADIN_AVENGING_WRATH_MARKER) || target->HasAura(SPELL_PALADIN_IMMUNE_SHIELD_MARKER))
+                        if (target->HasAura(SPELL_PALADIN_FORBEARANCE) ||
+                            target->HasAura(SPELL_PALADIN_IMMUNE_SHIELD_MARKER))
+                        {
                             return SPELL_FAILED_TARGET_AURASTATE;
+                        }
 
                 return SPELL_CAST_OK;
             }
@@ -714,7 +709,6 @@ class spell_pal_lay_on_hands : public SpellScriptLoader
                 if (caster == GetHitUnit())
                 {
                     caster->CastSpell(caster, SPELL_PALADIN_FORBEARANCE, true);
-                    caster->CastSpell(caster, SPELL_PALADIN_AVENGING_WRATH_MARKER, true);
                     caster->CastSpell(caster, SPELL_PALADIN_IMMUNE_SHIELD_MARKER, true);
                 }
             }
