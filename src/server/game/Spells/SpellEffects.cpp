@@ -2754,12 +2754,13 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 
     // add new enchanting if equipped
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, true);
-    
+    /*
     if(pEnchant->aura_id != 0)
     {
         item_owner->CastSpell(item_owner, pEnchant->aura_id, true, itemTarget);
         printf("Adding Aura\n");
     }
+    */
 }
 
 void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
