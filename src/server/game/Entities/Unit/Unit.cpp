@@ -16285,7 +16285,8 @@ bool Unit::SetCanFly(bool enable)
     else
     {
         RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_MASK_MOVING_FLY);
-        if (!IsLevitating())
+        // Edited By XEQT removed "!"
+        if (IsLevitating())
             SetFall(true);
     }
 
